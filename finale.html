@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>С Годовщиной · Два Года</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Montserrat:wght@100;200;300;400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #fdf6ec;
+      --gold: #c9a84c;
+      --deep: #0d0a06;
+      --rose: #c4706a;
+      --ink: #fdf6ec;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--deep);
+      min-height: 100vh;
+      font-family: 'Montserrat', sans-serif;
+      overflow: hidden;
+      cursor: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cursor {
+      position: fixed; width: 10px; height: 10px;
+      background: var(--gold); border-radius: 50%;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%,-50%);
+      mix-blend-mode: screen;
+    }
+
+    /* Starfield */
+    #canvas-stars {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* Fireworks canvas */
+    #canvas-fw {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 5;
+    }
+
+    /* Grain */
+    body::before {
+      content: '';
+      position: fixed; inset: -50%;
+      width: 200%; height: 200%;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 1; opacity: 0.5;
+    }
+
+    /* Main content */
+    .content {
+      position: relative; z-index: 10;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 24px;
+      max-width: 700px;
+    }
+
+    /* Ring animation */
+    .rings {
+      position: relative;
+      width: 120px; height: 120px;
+      margin-bottom: 50px;
+    }
+    .ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid;
+      inset: 0;
+      animation: ringPulse var(--d) ease-in-out infinite var(--dl);
+    }
+    .ring:nth-child(1) { border-color: rgba(201,168,76,0.6); --d: 3s; --dl: 0s; }
+    .ring:nth-child(2) { border-color: rgba(201,168,76,0.3); inset: -14px; --d: 3s; --dl: 0.4s; }
+    .ring:nth-child(3) { border-color: rgba(201,168,76,0.15); inset: -28px; --d: 3s; --dl: 0.8s; }
+    @keyframes ringPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.06); opacity: 0.6; }
+    }
+    .ring-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.8rem;
+      font-weight: 300;
+      color: var(--gold);
+    }
+
+    /* Text elements */
+    .label-top {
+      font-size: 0.55rem;
+      font-weight: 200;
+      letter-spacing: 0.55em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+      animation: fadeUp 1.2s 0.3s both;
+    }
+
+    .headline {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      font-weight: 300;
+      color: var(--cream);
+      line-height: 1.1;
+      margin-bottom: 12px;
+      animation: fadeUp 1.2s 0.6s both;
+    }
+    .headline em {
+      font-style: italic;
+      color: var(--rose);
+    }
+
+    .divider-line {
+      width: 200px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 28px auto;
+      position: relative;
+      animation: fadeUp 1s 0.8s both;
+    }
+    .divider-line::before {
+      content: '✦';
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%,-50%);
+      color: var(--gold);
+      font-size: 11px;
+      background: var(--deep);
+      padding: 0 10px;
+    }
+
+    .message-box {
+      max-width: 520px;
+      animation: fadeUp 1.2s 1s both;
+    }
+
+    .message-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1rem, 2.5vw, 1.3rem);
+      font-weight: 300;
+      font-style: italic;
+      color: rgba(253,246,236,0.85);
+      line-height: 1.9;
+      margin-bottom: 32px;
+    }
+
+    /* Interactive heart button */
+    .heart-btn {
+      position: relative;
+      background: none;
+      border: none;
+      cursor: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      margin: 20px auto 0;
+      animation: fadeUp 1.2s 1.4s both;
+    }
+    .heart-svg {
+      width: 64px; height: 64px;
+      filter: drop-shadow(0 0 12px rgba(196,112,106,0.5));
+      transition: transform 0.3s;
+      animation: heartPulse 2s ease-in-out infinite;
+    }
+    .heart-btn:hover .heart-svg {
+      transform: scale(1.15);
+      filter: drop-shadow(0 0 24px rgba(196,112,106,0.8));
+    }
+    @keyframes heartPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+    .heart-label {
+      font-size: 0.55rem;
+      font-weight: 200;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      color: rgba(201,168,76,0.7);
+      transition: color 0.3s;
+    }
+    .heart-btn:hover .heart-label { color: var(--gold); }
+
+    /* Secret message modal */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(13,10,6,0.92);
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s;
+      backdrop-filter: blur(8px);
+    }
+    .modal-backdrop.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .modal {
+      max-width: 520px;
+      width: 90%;
+      border: 1px solid rgba(201,168,76,0.25);
+      padding: 60px 52px;
+      position: relative;
+      transform: translateY(30px);
+      transition: transform 0.6s;
+      background: linear-gradient(160deg, #120e07, #1f180a);
+    }
+    .modal-backdrop.show .modal { transform: translateY(0); }
+
+    .modal::before, .modal::after {
+      content: '';
+      position: absolute;
+      width: 20px; height: 20px;
+      border-color: var(--gold);
+      border-style: solid;
+      opacity: 0.5;
+    }
+    .modal::before { top: 10px; left: 10px; border-width: 1px 0 0 1px; }
+    .modal::after { bottom: 10px; right: 10px; border-width: 0 1px 1px 0; }
+
+    .modal-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem;
+      font-weight: 300;
+      color: var(--gold);
+      text-align: center;
+      margin-bottom: 28px;
+      font-style: italic;
+    }
+    .modal-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      font-weight: 300;
+      color: rgba(253,246,236,0.85);
+      line-height: 1.9;
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .modal-close {
+      display: block;
+      margin: 0 auto;
+      background: none;
+      border: 1px solid rgba(201,168,76,0.3);
+      color: var(--gold);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.55rem;
+      font-weight: 300;
+      letter-spacing: 0.45em;
+      text-transform: uppercase;
+      padding: 14px 32px;
+      cursor: none;
+      transition: all 0.4s;
+    }
+    .modal-close:hover {
+      background: rgba(201,168,76,0.1);
+      border-color: var(--gold);
+    }
+
+    /* Bottom label */
+    .bottom-label {
+      position: fixed;
+      bottom: 32px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.5rem;
+      letter-spacing: 0.6em;
+      text-transform: uppercase;
+      color: rgba(201,168,76,0.3);
+      z-index: 20;
+      animation: fadeUp 1.2s 2s both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Entry overlay */
+    .entry-overlay {
+      position: fixed; inset: 0;
+      background: var(--deep);
+      z-index: 200;
+      pointer-events: none;
+      transition: opacity 1s ease;
+    }
+    .entry-overlay.gone { opacity: 0; }
+  </style>
+</head>
+<body>
+  <div class="cursor" id="cursor"></div>
+  <div class="entry-overlay" id="entryOverlay"></div>
+
+  <canvas id="canvas-stars"></canvas>
+  <canvas id="canvas-fw"></canvas>
+
+  <div class="content">
+    <div class="label-top">Два года вместе</div>
+
+    <div class="rings">
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring-center">II</div>
+    </div>
+
+    <div class="headline">С годовщиной,<br><em>моя любимая</em></div>
+
+    <div class="divider-line"></div>
+
+    <div class="message-box">
+      <div class="message-text">
+        Два года назад что-то началось. Негромко, почти незаметно · но именно так начинается всё самое важное. С тех пор ты стала той, с кем я хочу делить каждый обычный вторник и каждый особенный момент.
+      </div>
+    </div>
+
+    <button class="heart-btn" onclick="openSecret()">
+      <svg class="heart-svg" viewBox="0 0 100 90" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50 85 C50 85 5 52 5 28 C5 14 17 5 30 5 C38 5 45 9 50 15 C55 9 62 5 70 5 C83 5 95 14 95 28 C95 52 50 85 50 85Z"
+          fill="#c4706a" stroke="none"/>
+        <path d="M50 85 C50 85 5 52 5 28 C5 14 17 5 30 5 C38 5 45 9 50 15 C55 9 62 5 70 5 C83 5 95 14 95 28 C95 52 50 85 50 85Z"
+          fill="none" stroke="rgba(255,180,170,0.4)" stroke-width="1"/>
+      </svg>
+      <span class="heart-label">Нажми на сердце</span>
+    </button>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-backdrop" id="modal">
+    <div class="modal">
+      <div class="modal-title">Только для тебя ✦</div>
+      <div class="modal-text">
+        Ты · человек, рядом с которым я хочу встречать каждое утро. Спасибо за терпение, за смех, за то, что остаёшься собой рядом со мной. Эти два года · лучшее, что со мной случалось.<br><br>
+        <em>И я уже с нетерпением жду следующих двух.</em>
+      </div>
+      <button class="modal-close" onclick="closeSecret()">Закрыть</button>
+    </div>
+  </div>
+
+  <div class="bottom-label">✦ С любовью ✦</div>
+
+  <script>
+    // Cursor
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+    });
+
+    // Entry
+    setTimeout(() => {
+      document.getElementById('entryOverlay').classList.add('gone');
+    }, 100);
+
+    // Stars canvas
+    const starsCanvas = document.getElementById('canvas-stars');
+    const sCtx = starsCanvas.getContext('2d');
+
+    function resizeCanvas() {
+      starsCanvas.width = window.innerWidth;
+      starsCanvas.height = window.innerHeight;
+      document.getElementById('canvas-fw').width = window.innerWidth;
+      document.getElementById('canvas-fw').height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Draw static stars
+    function drawStars() {
+      sCtx.clearRect(0, 0, starsCanvas.width, starsCanvas.height);
+      const stars = [];
+      for (let i = 0; i < 200; i++) {
+        stars.push({
+          x: Math.random() * starsCanvas.width,
+          y: Math.random() * starsCanvas.height,
+          r: Math.random() * 1.5 + 0.3,
+          a: Math.random(),
+          speed: Math.random() * 0.008 + 0.002
+        });
+      }
+
+      let t = 0;
+      function animStars() {
+        sCtx.clearRect(0, 0, starsCanvas.width, starsCanvas.height);
+        t += 0.01;
+        stars.forEach(s => {
+          const alpha = s.a * (0.4 + 0.6 * Math.sin(t * s.speed * 100));
+          sCtx.beginPath();
+          sCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          sCtx.fillStyle = `rgba(255,255,255,${alpha})`;
+          sCtx.fill();
+        });
+        requestAnimationFrame(animStars);
+      }
+      animStars();
+    }
+    drawStars();
+
+    // Fireworks
+    const fwCanvas = document.getElementById('canvas-fw');
+    const fCtx = fwCanvas.getContext('2d');
+
+    const COLORS = [
+      [201, 168, 76],   // gold
+      [196, 112, 106],  // rose
+      [253, 246, 236],  // cream
+      [255, 220, 150],  // warm
+      [180, 130, 180],  // lavender
+    ];
+
+    class Particle {
+      constructor(x, y, color) {
+        this.x = x; this.y = y;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 5 + 1.5;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.alpha = 1;
+        this.decay = Math.random() * 0.02 + 0.012;
+        this.color = color;
+        this.size = Math.random() * 3 + 1;
+        this.trail = [];
+      }
+      update() {
+        this.trail.push({ x: this.x, y: this.y });
+        if (this.trail.length > 6) this.trail.shift();
+        this.vy += 0.08;
+        this.vx *= 0.98;
+        this.x += this.vx;
+        this.y += this.vy;
+        this.alpha -= this.decay;
+      }
+      draw(ctx) {
+        // Trail
+        this.trail.forEach((p, i) => {
+          const a = (i / this.trail.length) * this.alpha * 0.4;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, this.size * 0.5, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${this.color[0]},${this.color[1]},${this.color[2]},${a})`;
+          ctx.fill();
+        });
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${this.color[0]},${this.color[1]},${this.color[2]},${this.alpha})`;
+        ctx.fill();
+      }
+    }
+
+    let particles = [];
+
+    function launchFirework() {
+      const x = fwCanvas.width * (0.2 + Math.random() * 0.6);
+      const y = fwCanvas.height * (0.1 + Math.random() * 0.45);
+      const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+      const count = 60 + Math.floor(Math.random() * 40);
+      for (let i = 0; i < count; i++) {
+        particles.push(new Particle(x, y, color));
+      }
+    }
+
+    function animFW() {
+      fCtx.fillStyle = 'rgba(13,10,6,0.18)';
+      fCtx.fillRect(0, 0, fwCanvas.width, fwCanvas.height);
+
+      particles = particles.filter(p => p.alpha > 0);
+      particles.forEach(p => { p.update(); p.draw(fCtx); });
+      requestAnimationFrame(animFW);
+    }
+    animFW();
+
+    // Auto-launch fireworks
+    function scheduleFirework() {
+      launchFirework();
+      setTimeout(scheduleFirework, 900 + Math.random() * 1200);
+    }
+    setTimeout(scheduleFirework, 1500);
+
+    // Click to add firework
+    document.addEventListener('click', e => {
+      if (e.target.closest('.modal-backdrop') || e.target.closest('button')) return;
+      const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+      for (let i = 0; i < 80; i++) {
+        particles.push(new Particle(e.clientX, e.clientY, color));
+      }
+    });
+
+    // Modal
+    function openSecret() {
+      document.getElementById('modal').classList.add('show');
+      // Extra firework burst
+      for (let i = 0; i < 4; i++) {
+        setTimeout(() => launchFirework(), i * 250);
+      }
+    }
+    function closeSecret() {
+      document.getElementById('modal').classList.remove('show');
+    }
+  </script>
+</body>
+</html>

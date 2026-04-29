@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Наша история</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@200;300;400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #fdf6ec;
+      --gold: #c9a84c;
+      --deep: #1a1209;
+      --rose: #c4706a;
+      --ink: #2d1f0e;
+      --paper: #f5ead8;
+      --shadow: rgba(26,18,9,0.4);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--deep);
+      min-height: 100vh;
+      font-family: 'Montserrat', sans-serif;
+      overflow: hidden;
+      cursor: none;
+    }
+
+    .cursor {
+      position: fixed; width: 10px; height: 10px;
+      background: var(--gold); border-radius: 50%;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%,-50%);
+      mix-blend-mode: screen;
+      transition: transform 0.15s;
+    }
+    .cursor.big { transform: translate(-50%,-50%) scale(3); opacity: 0.5; }
+
+    /* Book container */
+    .book-wrap {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 2000px;
+    }
+
+    .book {
+      position: relative;
+      width: min(90vw, 860px);
+      height: min(85vh, 560px);
+      transform-style: preserve-3d;
+    }
+
+    /* Pages */
+    .page {
+      position: absolute;
+      inset: 0;
+      background: var(--paper);
+      border-radius: 3px 12px 12px 3px;
+      display: flex;
+      overflow: hidden;
+      box-shadow:
+        0 25px 80px rgba(0,0,0,0.6),
+        inset -2px 0 8px rgba(0,0,0,0.1);
+      opacity: 0;
+      pointer-events: none;
+      transform: rotateY(-5deg);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .page.active {
+      opacity: 1;
+      pointer-events: all;
+      transform: rotateY(0deg);
+    }
+    .page.exit {
+      opacity: 0;
+      transform: rotateY(-15deg);
+      pointer-events: none;
+    }
+
+    /* Left spine decoration */
+    .page::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 32px;
+      background: linear-gradient(180deg, #c9a84c22, #c9a84c44, #c9a84c22);
+      border-right: 1px solid rgba(201,168,76,0.2);
+      z-index: 2;
+    }
+
+    /* Left: illustration / visual */
+    .page-left {
+      width: 42%;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    /* Right: text */
+    .page-right {
+      flex: 1;
+      padding: 48px 44px 48px 36px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .chapter-num {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.55rem;
+      font-weight: 200;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    .chapter-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 300;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 24px;
+    }
+    .chapter-title em {
+      color: var(--rose);
+      font-style: italic;
+    }
+
+    .chapter-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(0.9rem, 2vw, 1.1rem);
+      font-weight: 300;
+      color: #4a3520;
+      line-height: 1.85;
+      margin-bottom: 28px;
+    }
+
+    .chapter-quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(0.85rem, 1.8vw, 1rem);
+      color: var(--rose);
+      border-left: 2px solid var(--rose);
+      padding-left: 16px;
+      line-height: 1.6;
+      opacity: 0.85;
+    }
+
+    .page-num {
+      position: absolute;
+      bottom: 24px; right: 36px;
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      color: rgba(74,53,32,0.4);
+      font-family: 'Cormorant Garamond', serif;
+    }
+
+    /* Illustrations (CSS art) */
+
+    /* CH1 - two figures meeting */
+    .illus-ch1 {
+      width: 100%; height: 100%;
+      background: linear-gradient(160deg, #1a1209 0%, #2d1f0e 40%, #3d2a14 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .illus-ch1 .moon {
+      position: absolute;
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #f5d98e, #c9a84c);
+      top: 15%; left: 50%; transform: translateX(-50%);
+      box-shadow: 0 0 40px rgba(201,168,76,0.5), 0 0 80px rgba(201,168,76,0.2);
+    }
+    .illus-ch1 .ground {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 35%;
+      background: linear-gradient(0deg, #0d0a05, #1a1209);
+      border-top: 1px solid rgba(201,168,76,0.15);
+    }
+    .illus-ch1 .silhouette {
+      position: absolute;
+      bottom: 35%;
+      width: 24px;
+    }
+    .illus-ch1 .s1 { left: 32%; }
+    .illus-ch1 .s2 { right: 28%; transform: scaleX(-1); }
+    .illus-ch1 .body {
+      width: 12px; height: 36px;
+      background: var(--deep);
+      border-radius: 6px 6px 4px 4px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .illus-ch1 .head {
+      width: 14px; height: 14px;
+      background: var(--deep);
+      border-radius: 50%;
+      margin: 0 auto;
+    }
+    .illus-ch1 .moonbeam {
+      position: absolute;
+      width: 1px;
+      background: linear-gradient(180deg, rgba(201,168,76,0.3), transparent);
+      top: 24%; left: 50%;
+      animation: beamPulse 3s ease-in-out infinite;
+    }
+    @keyframes beamPulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+    .illus-ch1 .sparkle-star {
+      position: absolute;
+      color: var(--gold);
+      font-size: 10px;
+      animation: twinkle2 var(--d) ease-in-out infinite var(--dl);
+    }
+    @keyframes twinkle2 {
+      0%, 100% { opacity: 0.2; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.3); }
+    }
+
+    /* CH2 - rain kiss */
+    .illus-ch2 {
+      width: 100%; height: 100%;
+      background: linear-gradient(180deg, #0d1520 0%, #1a2a3a 50%, #0f1a10 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .illus-ch2 .rain-drop {
+      position: absolute;
+      width: 1px;
+      background: linear-gradient(180deg, transparent, rgba(180,210,255,0.6), transparent);
+      animation: rainFall linear infinite;
+      top: -60px;
+    }
+    @keyframes rainFall {
+      0% { transform: translateY(0); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 0.6; }
+      100% { transform: translateY(110%); opacity: 0; }
+    }
+    .illus-ch2 .puddle-glow {
+      position: absolute;
+      bottom: 10%;
+      left: 50%; transform: translateX(-50%);
+      width: 80px; height: 14px;
+      background: radial-gradient(ellipse, rgba(180,210,255,0.2), transparent);
+      border-radius: 50%;
+      animation: puddlePulse 3s ease-in-out infinite;
+    }
+    @keyframes puddlePulse {
+      0%, 100% { opacity: 0.5; width: 80px; }
+      50% { opacity: 1; width: 95px; }
+    }
+    .illus-ch2 .sil-pair {
+      position: absolute;
+      bottom: 20%;
+      left: 50%; transform: translateX(-50%);
+      display: flex; gap: 4px; align-items: flex-end;
+    }
+    .illus-ch2 .sil {
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .illus-ch2 .sil-head {
+      width: 13px; height: 13px;
+      background: #0a1018;
+      border-radius: 50%;
+    }
+    .illus-ch2 .sil-body {
+      width: 11px; height: 32px;
+      background: #0a1018;
+      border-radius: 5px 5px 3px 3px;
+    }
+    .illus-ch2 .sil.lean { transform: rotate(6deg) translateX(-2px); transform-origin: bottom center; }
+    .illus-ch2 .sil.lean2 { transform: rotate(-6deg) translateX(2px); transform-origin: bottom center; }
+    .illus-ch2 .lamp {
+      position: absolute;
+      top: 14%; right: 18%;
+      width: 3px; height: 55%;
+      background: rgba(201,168,76,0.2);
+    }
+    .illus-ch2 .lamp::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%; transform: translateX(-50%);
+      width: 18px; height: 10px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(255,220,100,0.5), transparent);
+    }
+    .illus-ch2 .lamp-glow {
+      position: absolute;
+      top: 14%; right: calc(18% - 30px);
+      width: 60px; height: 90px;
+      background: radial-gradient(ellipse at top, rgba(255,200,80,0.1), transparent 70%);
+      pointer-events: none;
+    }
+
+    /* CH3 - adventure / travel */
+    .illus-ch3 {
+      width: 100%; height: 100%;
+      background: linear-gradient(180deg, #0f3460 0%, #1a6b8a 45%, #c4706a 45%, #e8a87c 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .illus-ch3 .sun {
+      position: absolute;
+      width: 50px; height: 50px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ffd180, #ff9800);
+      top: 36%; left: 50%; transform: translate(-50%, -50%);
+      box-shadow: 0 0 30px rgba(255,180,0,0.6);
+    }
+    .illus-ch3 .mountain {
+      position: absolute;
+      bottom: 28%;
+      border-left: solid transparent;
+      border-right: solid transparent;
+      border-bottom: solid;
+    }
+    .illus-ch3 .m1 {
+      border-left-width: 50px; border-right-width: 50px;
+      border-bottom-width: 90px;
+      border-bottom-color: #1a3a5e;
+      left: 5%;
+    }
+    .illus-ch3 .m2 {
+      border-left-width: 65px; border-right-width: 65px;
+      border-bottom-width: 110px;
+      border-bottom-color: #0f2a48;
+      left: 30%;
+    }
+    .illus-ch3 .m3 {
+      border-left-width: 45px; border-right-width: 45px;
+      border-bottom-width: 80px;
+      border-bottom-color: #1e3f6a;
+      right: 10%;
+    }
+    .illus-ch3 .road {
+      position: absolute;
+      bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 20px; height: 28%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.25));
+    }
+    .illus-ch3 .bird {
+      position: absolute;
+      color: white;
+      font-size: 10px;
+      opacity: 0.7;
+      animation: birdFly 4s linear infinite;
+    }
+    @keyframes birdFly {
+      0% { transform: translateX(-30px); opacity: 0; }
+      20% { opacity: 0.7; }
+      80% { opacity: 0.7; }
+      100% { transform: translateX(30px); opacity: 0; }
+    }
+
+    /* CH4 - home / warmth */
+    .illus-ch4 {
+      width: 100%; height: 100%;
+      background: linear-gradient(160deg, #0d0a05, #1f150a 50%, #2a1b0d 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .illus-ch4 .house {
+      position: absolute;
+      bottom: 20%; left: 50%; transform: translateX(-50%);
+    }
+    .illus-ch4 .roof {
+      width: 0; height: 0;
+      border-left: 55px solid transparent;
+      border-right: 55px solid transparent;
+      border-bottom: 44px solid rgba(201,168,76,0.3);
+      margin: 0 auto;
+    }
+    .illus-ch4 .walls {
+      width: 88px; height: 60px;
+      background: rgba(201,168,76,0.1);
+      border: 1px solid rgba(201,168,76,0.25);
+      position: relative;
+      margin: 0 auto;
+    }
+    .illus-ch4 .win {
+      position: absolute;
+      width: 20px; height: 18px;
+      border: 1px solid rgba(201,168,76,0.4);
+      background: radial-gradient(ellipse, rgba(255,220,100,0.4), rgba(255,180,60,0.1));
+      top: 12px;
+      animation: winGlow 3s ease-in-out infinite;
+    }
+    .illus-ch4 .win.left { left: 10px; }
+    .illus-ch4 .win.right { right: 10px; }
+    @keyframes winGlow {
+      0%, 100% { box-shadow: 0 0 8px rgba(255,200,80,0.3); }
+      50% { box-shadow: 0 0 20px rgba(255,200,80,0.6); }
+    }
+    .illus-ch4 .chimney {
+      position: absolute;
+      width: 14px; height: 20px;
+      background: rgba(201,168,76,0.2);
+      border: 1px solid rgba(201,168,76,0.25);
+      top: -30px; right: 16px;
+    }
+    .illus-ch4 .smoke {
+      position: absolute;
+      top: -50px; right: 18px;
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+    }
+    .illus-ch4 .smoke-puff {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      animation: smokeDrift 3s ease-in-out infinite;
+    }
+    .illus-ch4 .smoke-puff:nth-child(2) { animation-delay: 1s; width: 14px; height: 14px; }
+    .illus-ch4 .smoke-puff:nth-child(3) { animation-delay: 2s; width: 18px; height: 18px; }
+    @keyframes smokeDrift {
+      0% { transform: translateX(0) translateY(0); opacity: 0; }
+      30% { opacity: 0.5; }
+      100% { transform: translateX(12px) translateY(-20px); opacity: 0; }
+    }
+    .illus-ch4 .stars-small {
+      position: absolute; inset: 0;
+    }
+
+    /* Navigation */
+    .nav {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      z-index: 200;
+    }
+    .nav-btn {
+      background: none;
+      border: 1px solid rgba(201,168,76,0.35);
+      color: var(--gold);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 300;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      padding: 12px 28px;
+      cursor: none;
+      transition: all 0.4s;
+    }
+    .nav-btn:hover { background: rgba(201,168,76,0.12); border-color: var(--gold); }
+    .nav-btn:disabled { opacity: 0.25; pointer-events: none; }
+
+    .progress-dots {
+      display: flex; gap: 8px;
+    }
+    .dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      border: 1px solid var(--gold);
+      transition: all 0.4s;
+    }
+    .dot.active {
+      background: var(--gold);
+      transform: scale(1.3);
+    }
+
+    /* Transition */
+    .overlay {
+      position: fixed; inset: 0;
+      background: var(--deep);
+      z-index: 1000;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.7s ease;
+    }
+    .overlay.show { opacity: 1; pointer-events: all; }
+
+    /* Entry animation */
+    @keyframes textReveal {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .page.active .chapter-num { animation: textReveal 0.8s 0.2s both; }
+    .page.active .chapter-title { animation: textReveal 0.8s 0.4s both; }
+    .page.active .chapter-text { animation: textReveal 0.8s 0.6s both; }
+    .page.active .chapter-quote { animation: textReveal 0.8s 0.8s both; }
+  </style>
+</head>
+<body>
+  <div class="cursor" id="cursor"></div>
+  <div class="overlay" id="overlay"></div>
+
+  <div class="book-wrap">
+    <div class="book" id="book">
+
+      <!-- Chapter 1: The Beginning -->
+      <div class="page active" id="page-0">
+        <div class="page-left">
+          <div class="illus-ch1">
+            <div class="moon"></div>
+            <div class="moonbeam" style="height:60%;"></div>
+            <!-- stars -->
+            <div class="sparkle-star" style="left:15%;top:12%;--d:2.1s;--dl:-0.5s;">✦</div>
+            <div class="sparkle-star" style="left:75%;top:8%;--d:3.2s;--dl:-1s;">✦</div>
+            <div class="sparkle-star" style="left:30%;top:20%;--d:1.8s;--dl:-0.2s;">·</div>
+            <div class="sparkle-star" style="left:85%;top:25%;--d:2.7s;--dl:-1.5s;">✦</div>
+            <div class="sparkle-star" style="left:10%;top:40%;--d:3.5s;--dl:-0.8s;">·</div>
+            <div class="sparkle-star" style="left:90%;top:45%;--d:2.0s;--dl:-0.3s;">·</div>
+            <div class="sparkle-star" style="left:55%;top:10%;--d:2.8s;--dl:-1.2s;">✦</div>
+            <div class="silhouette s1"><div class="head"></div><div class="body"></div></div>
+            <div class="silhouette s2"><div class="head"></div><div class="body"></div></div>
+            <div class="ground"></div>
+          </div>
+        </div>
+        <div class="page-right">
+          <div class="chapter-num">Глава I · Начало</div>
+          <div class="chapter-title">Общие друзья,<br><em>случайный вечер</em></div>
+          <div class="chapter-text">
+            Нас познакомили общие друзья. Обычный вечер, обычная компания , ничего не предвещало. Просто в какой-то момент ты оказалась рядом, и разговор сам собой не заканчивался.
+          </div>
+          <div class="chapter-quote">
+            «Самые важные встречи выглядят как случайность.»
+          </div>
+          <div class="page-num">I</div>
+        </div>
+      </div>
+
+      <!-- Chapter 2: First memories -->
+      <div class="page" id="page-1">
+        <div class="page-left">
+          <div class="illus-ch2" id="rain-illus">
+            <div class="lamp"></div>
+            <div class="lamp-glow"></div>
+            <div class="sil-pair">
+              <div class="sil lean"><div class="sil-head"></div><div class="sil-body"></div></div>
+              <div class="sil lean2"><div class="sil-head"></div><div class="sil-body"></div></div>
+            </div>
+            <div class="puddle-glow"></div>
+          </div>
+        </div>
+        <div class="page-right">
+          <div class="chapter-num">Глава II · Дождь</div>
+          <div class="chapter-title">До подъезда<br><em>оставалось немного</em></div>
+          <div class="chapter-text">
+            Все разошлись по домам, и мы пошли вместе. Дождь начался внезапно, мы почти добежали до подъезда. Почти. Где-то в двух шагах от двери мы остановились и поцеловались прямо под дождём. Этот момент я помню лучше всего.
+          </div>
+          <div class="chapter-quote">
+            «Тот поцелуй я помню каждой каплей дождя.»
+          </div>
+          <div class="page-num">II</div>
+        </div>
+      </div>
+
+      <!-- Chapter 3: Adventures -->
+      <div class="page" id="page-2">
+        <div class="page-left">
+          <div class="illus-ch3">
+            <div class="sun"></div>
+            <div class="mountain m1"></div>
+            <div class="mountain m2"></div>
+            <div class="mountain m3"></div>
+            <div class="road"></div>
+            <div class="bird" style="top:20%;left:20%;">〜</div>
+            <div class="bird" style="top:15%;left:60%;animation-delay:-2s;">〜</div>
+          </div>
+        </div>
+        <div class="page-right">
+          <div class="chapter-num">Глава III · Дома</div>
+          <div class="chapter-title">Тёплышко<br><em>и тихий вечер</em></div>
+          <div class="chapter-text">
+            Роблокс, Айзек, «Как достать соседа», плед, какой-нибудь фильм. Иногда готовим вместе, иногда просто валяемся и шутим весь день. Как сегодня. Мне не нужно никуда, когда ты рядом , это уже само по себе лучший вечер.
+          </div>
+          <div class="chapter-quote">
+            «Лучший вечер это ты, плед и никуда не надо.»
+          </div>
+          <div class="page-num">III</div>
+        </div>
+      </div>
+
+      <!-- Chapter 4: Home -->
+      <div class="page" id="page-3">
+        <div class="page-left">
+          <div class="illus-ch4">
+            <div class="house">
+              <div class="chimney">
+                <div class="smoke">
+                  <div class="smoke-puff"></div>
+                  <div class="smoke-puff"></div>
+                  <div class="smoke-puff"></div>
+                </div>
+              </div>
+              <div class="roof"></div>
+              <div class="walls">
+                <div class="win left"></div>
+                <div class="win right"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="page-right">
+          <div class="chapter-num">Глава IV · Два года</div>
+          <div class="chapter-title">Всё то,<br><em>что мы построили</em></div>
+          <div class="chapter-text">
+            Два года, Даша. Это тот дождь у подъезда, это вечера с игрой, это смех сегодня. Это тысячи маленьких моментов, которые никто не замечает кроме нас. Я не умею говорить красиво, но знаю точно: ты моё тепло. И я хочу ещё тысячу таких вечеров рядом с тобой.
+          </div>
+          <div class="chapter-quote">
+            «Хочу ещё тысячу таких вечеров, просто рядом с тобой.»
+          </div>
+          <div class="page-num">IV</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="nav">
+    <button class="nav-btn" id="prevBtn" onclick="changePage(-1)" disabled>← Назад</button>
+    <div class="progress-dots" id="dots"></div>
+    <button class="nav-btn" id="nextBtn" onclick="changePage(1)">Вперёд →</button>
+  </div>
+
+  <script>
+    let current = 0;
+    const total = 4;
+
+    // Cursor
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+    });
+    document.querySelectorAll('button').forEach(b => {
+      b.addEventListener('mouseenter', () => cursor.classList.add('big'));
+      b.addEventListener('mouseleave', () => cursor.classList.remove('big'));
+    });
+
+    // Dots
+    const dotsEl = document.getElementById('dots');
+    for (let i = 0; i < total; i++) {
+      const d = document.createElement('div');
+      d.className = 'dot' + (i === 0 ? ' active' : '');
+      dotsEl.appendChild(d);
+    }
+
+    function updateDots() {
+      document.querySelectorAll('.dot').forEach((d, i) => {
+        d.classList.toggle('active', i === current);
+      });
+    }
+
+    function changePage(dir) {
+      const next = current + dir;
+      if (next < 0) return;
+
+      const overlay = document.getElementById('overlay');
+
+      if (next >= total) {
+        // Go to finale
+        overlay.classList.add('show');
+        setTimeout(() => { window.location.href = 'finale.html'; }, 800);
+        return;
+      }
+
+      // Page transition
+      const pages = document.querySelectorAll('.page');
+      pages[current].classList.remove('active');
+      pages[current].classList.add('exit');
+
+      setTimeout(() => {
+        pages[current].classList.remove('exit');
+        current = next;
+        pages[current].classList.add('active');
+        updateDots();
+        updateNav();
+      }, 300);
+    }
+
+    function updateNav() {
+      document.getElementById('prevBtn').disabled = current === 0;
+      const nextBtn = document.getElementById('nextBtn');
+      nextBtn.textContent = current === total - 1 ? 'К финалу ✦' : 'Вперёд →';
+    }
+
+    updateNav();
+
+    // Keyboard
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') changePage(1);
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') changePage(-1);
+    });
+
+    // Rain drops for chapter 2
+    function buildRain() {
+      const el = document.getElementById('rain-illus');
+      if (!el) return;
+      for (let i = 0; i < 38; i++) {
+        const d = document.createElement('div');
+        d.className = 'rain-drop';
+        d.style.left = (Math.random() * 100) + '%';
+        d.style.height = (18 + Math.random() * 28) + 'px';
+        const dur = (0.6 + Math.random() * 0.6).toFixed(2) + 's';
+        d.style.animationDuration = dur;
+        d.style.animationDelay = (-Math.random() * 1.2).toFixed(2) + 's';
+        d.style.opacity = (0.3 + Math.random() * 0.5).toFixed(2);
+        el.appendChild(d);
+      }
+    }
+    buildRain();
+
+    // Entry
+    const overlay = document.getElementById('overlay');
+    overlay.classList.add('show');
+    setTimeout(() => overlay.classList.remove('show'), 800);
+  </script>
+</body>
+</html>

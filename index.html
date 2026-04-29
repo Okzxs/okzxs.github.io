@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Наши два года</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Montserrat:wght@200;300;400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #fdf6ec;
+      --gold: #c9a84c;
+      --deep: #1a1209;
+      --rose: #c4706a;
+      --ink: #2d1f0e;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--deep);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      font-family: 'Montserrat', sans-serif;
+      cursor: none;
+    }
+
+    /* custom cursor */
+    .cursor {
+      position: fixed;
+      width: 12px; height: 12px;
+      background: var(--gold);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%,-50%);
+      transition: transform 0.1s, opacity 0.3s;
+      mix-blend-mode: screen;
+    }
+    .cursor-trail {
+      position: fixed;
+      width: 6px; height: 6px;
+      background: var(--rose);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%,-50%);
+      opacity: 0.5;
+      transition: transform 0.25s, opacity 0.3s;
+      mix-blend-mode: screen;
+    }
+
+    /* background stars */
+    .stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .star {
+      position: absolute;
+      width: 2px; height: 2px;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle var(--d, 3s) ease-in-out infinite var(--delay, 0s);
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.1; transform: scale(1); }
+      50% { opacity: 0.9; transform: scale(1.5); }
+    }
+
+    /* Grain texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: -50%;
+      width: 200%; height: 200%;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.4;
+    }
+
+    /* Center book cover */
+    .cover {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      animation: coverFadeIn 2s ease-out forwards;
+    }
+
+    @keyframes coverFadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .roman-numeral {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(6rem, 18vw, 12rem);
+      font-weight: 300;
+      color: transparent;
+      -webkit-text-stroke: 1px var(--gold);
+      letter-spacing: 0.15em;
+      line-height: 1;
+      position: relative;
+      animation: numFloat 6s ease-in-out infinite;
+    }
+    @keyframes numFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .roman-numeral::after {
+      content: 'II';
+      position: absolute;
+      inset: 0;
+      color: var(--gold);
+      opacity: 0.08;
+      filter: blur(20px);
+      z-index: -1;
+    }
+
+    .divider {
+      width: 160px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 24px 0;
+      position: relative;
+    }
+    .divider::before {
+      content: '✦';
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--gold);
+      font-size: 12px;
+      background: var(--deep);
+      padding: 0 10px;
+    }
+
+    .title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.5rem, 5vw, 2.8rem);
+      font-weight: 300;
+      color: var(--cream);
+      letter-spacing: 0.1em;
+      line-height: 1.3;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      font-family: 'Montserrat', sans-serif;
+      font-size: clamp(0.55rem, 1.5vw, 0.7rem);
+      font-weight: 200;
+      color: var(--gold);
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      margin-bottom: 60px;
+    }
+
+    .open-btn {
+      position: relative;
+      background: none;
+      border: 1px solid rgba(201, 168, 76, 0.4);
+      color: var(--cream);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 300;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      padding: 18px 52px;
+      cursor: none;
+      transition: all 0.6s ease;
+      overflow: hidden;
+    }
+    .open-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--gold);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: -1;
+    }
+    .open-btn:hover::before { transform: scaleX(1); }
+    .open-btn:hover { color: var(--deep); border-color: var(--gold); }
+
+    /* Floating petals */
+    .petal {
+      position: fixed;
+      pointer-events: none;
+      z-index: 2;
+      font-size: 14px;
+      animation: petalFall linear infinite;
+      opacity: 0;
+    }
+    @keyframes petalFall {
+      0% { transform: translateY(-20px) rotate(0deg); opacity: 0; }
+      10% { opacity: 0.7; }
+      90% { opacity: 0.4; }
+      100% { transform: translateY(110vh) rotate(var(--rot, 360deg)); opacity: 0; }
+    }
+
+    /* Page transition */
+    .transition-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--deep);
+      z-index: 100;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+    .transition-overlay.active { opacity: 1; pointer-events: all; }
+
+    .year-dots {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 40px;
+    }
+    .year-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+      opacity: 0.4;
+      animation: dotPulse 2s ease-in-out infinite;
+    }
+    .year-dot:nth-child(2) { animation-delay: 0.7s; }
+    @keyframes dotPulse {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.4); }
+    }
+  </style>
+</head>
+<body>
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-trail" id="cursorTrail"></div>
+  <div class="stars" id="stars"></div>
+  <div class="transition-overlay" id="overlay"></div>
+
+  <div class="cover">
+    <div class="roman-numeral">II</div>
+    <div class="divider"></div>
+    <div class="title">Два года<br><em>нашей истории</em></div>
+    <div class="subtitle">Книга о нас</div>
+    <div class="year-dots">
+      <div class="year-dot"></div>
+      <div class="year-dot"></div>
+    </div>
+    <button class="open-btn" onclick="openBook()">Открыть книгу</button>
+  </div>
+
+  <script>
+    // Stars
+    const starsEl = document.getElementById('stars');
+    for (let i = 0; i < 120; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      s.style.left = Math.random() * 100 + '%';
+      s.style.top = Math.random() * 100 + '%';
+      s.style.setProperty('--d', (2 + Math.random() * 4) + 's');
+      s.style.setProperty('--delay', (-Math.random() * 4) + 's');
+      s.style.width = s.style.height = (1 + Math.random() * 2.5) + 'px';
+      starsEl.appendChild(s);
+    }
+
+    // Petals
+    const petalChars = ['✿', '❀', '✾', '❁', '✽'];
+    for (let i = 0; i < 18; i++) {
+      const p = document.createElement('div');
+      p.className = 'petal';
+      p.textContent = petalChars[Math.floor(Math.random() * petalChars.length)];
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.color = Math.random() > 0.5 ? '#c4706a' : '#c9a84c';
+      p.style.opacity = (0.3 + Math.random() * 0.5).toString();
+      const dur = 12 + Math.random() * 20;
+      p.style.animationDuration = dur + 's';
+      p.style.animationDelay = (-Math.random() * dur) + 's';
+      p.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
+      document.body.appendChild(p);
+    }
+
+    // Cursor
+    const cursor = document.getElementById('cursor');
+    const cursorTrail = document.getElementById('cursorTrail');
+    let mx = 0, my = 0, tx = 0, ty = 0;
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursor.style.left = mx + 'px';
+      cursor.style.top = my + 'px';
+    });
+    function animateTrail() {
+      tx += (mx - tx) * 0.15;
+      ty += (my - ty) * 0.15;
+      cursorTrail.style.left = tx + 'px';
+      cursorTrail.style.top = ty + 'px';
+      requestAnimationFrame(animateTrail);
+    }
+    animateTrail();
+
+    // Open
+    function openBook() {
+      const overlay = document.getElementById('overlay');
+      overlay.classList.add('active');
+      setTimeout(() => { window.location.href = 'story.html'; }, 900);
+    }
+  </script>
+</body>
+</html>
