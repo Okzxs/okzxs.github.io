@@ -491,6 +491,98 @@
     .page.active .chapter-title { animation: textReveal 0.8s 0.4s both; }
     .page.active .chapter-text { animation: textReveal 0.8s 0.6s both; }
     .page.active .chapter-quote { animation: textReveal 0.8s 0.8s both; }
+
+    /* Mobile */
+    @media (max-width: 600px) {
+      body { cursor: auto; overflow: hidden; }
+      .cursor { display: none; }
+
+      .book-wrap {
+        align-items: flex-start;
+        padding: 16px 16px 0;
+      }
+
+      .book {
+        width: 100%;
+        height: calc(100vh - 100px);
+      }
+
+      .page {
+        border-radius: 8px;
+        flex-direction: column;
+      }
+
+      .page::before { display: none; }
+
+      .page-left { display: none; }
+
+      .page-right {
+        width: 100%;
+        padding: 32px 28px 28px;
+        justify-content: flex-start;
+        overflow-y: auto;
+      }
+
+      .chapter-num {
+        font-size: 0.5rem;
+        margin-bottom: 12px;
+      }
+
+      .chapter-title {
+        font-size: clamp(1.6rem, 7vw, 2.2rem);
+        margin-bottom: 20px;
+      }
+
+      .chapter-text {
+        font-size: clamp(1rem, 4vw, 1.15rem);
+        line-height: 1.75;
+        margin-bottom: 20px;
+      }
+
+      .chapter-quote {
+        font-size: clamp(0.9rem, 3.5vw, 1rem);
+      }
+
+      .page-num {
+        position: static;
+        display: block;
+        text-align: right;
+        margin-top: 20px;
+      }
+
+      .nav {
+        bottom: 0;
+        left: 0;
+        right: 0;
+        transform: none;
+        width: 100%;
+        gap: 0;
+        background: var(--deep);
+        border-top: 1px solid rgba(201,168,76,0.15);
+        padding: 0;
+        height: 68px;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        justify-items: center;
+      }
+
+      .nav-btn {
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        border: none;
+        border-radius: 0;
+        font-size: 0.55rem;
+        letter-spacing: 0.3em;
+        cursor: auto;
+      }
+
+      #prevBtn { border-right: 1px solid rgba(201,168,76,0.15); }
+      #nextBtn { border-left: 1px solid rgba(201,168,76,0.15); }
+
+      .progress-dots { padding: 0 12px; }
+    }
   </style>
 </head>
 <body>
@@ -520,10 +612,10 @@
           </div>
         </div>
         <div class="page-right">
-          <div class="chapter-num">Глава I · Начало</div>
+          <div class="chapter-num">Глава I· Начало</div>
           <div class="chapter-title">Общие друзья,<br><em>случайный вечер</em></div>
           <div class="chapter-text">
-            Нас познакомили общие друзья. Обычный вечер, обычная компания. И в какой-то момент ты оказалась рядом. Давно глядя на тебя я думал что нет шансов, но некая искра всё поменяла.
+            Нас познакомили общие друзья. Обычный вечер, обычная компания. И в какой-то момент ты оказалась рядом. Давно глядя на тебя, ядумал, что нет шансов. Но некая искра всё поменяла.
           </div>
           <div class="chapter-quote">
             «Самые важные встречи выглядят как случайность.»
@@ -546,8 +638,8 @@
           </div>
         </div>
         <div class="page-right">
-          <div class="chapter-num">Глава II · Дождь</div>
-          <div class="chapter-title">Лучший момент<br><em>этой истории</em></div>
+          <div class="chapter-num">Глава II· Дождь</div>
+          <div class="chapter-title">Один из лучших моментов<br><em>нашей истории</em></div>
           <div class="chapter-text">
             Мы пошли вместе. Дождь начался внезапно, мы почти добежали до дома. Почти. Где-то в двух шагах от двери мы остановились и поцеловались прямо под дождём. Этот момент я помню лучше всего.
           </div>
@@ -572,7 +664,7 @@
           </div>
         </div>
         <div class="page-right">
-          <div class="chapter-num">Глава III · Дома</div>
+          <div class="chapter-num">Глава III· Дома</div>
           <div class="chapter-title">Ты<br><em>и тихий вечер</em></div>
           <div class="chapter-text">
             Игры, пледики, какой-нибудь фильм. Иногда готовим вместе, иногда просто валяемся весь день. Нам не нужно никуда. Когда ты рядом, это уже сам по себе лучший вечер.
@@ -605,10 +697,10 @@
           </div>
         </div>
         <div class="page-right">
-          <div class="chapter-num">Глава IV · Два года</div>
+          <div class="chapter-num">Глава IV· Два года</div>
           <div class="chapter-title">Всё то,<br><em>что мы построили</em></div>
           <div class="chapter-text">
-            Два года, Даша. Это тот дождь у подъезда, те вечера с играми, наши совместно просмотреннные фильмы. Это тысячи маленьких моментов, которые никто не замечает кроме нас. Я не умею говорить красиво, но знаю точно: ты моё тепло. И я хочу ещё тысячу таких вечеров рядом с тобой.
+            Два года, Даша. Это тот дождь у подъезда, те вечера с играми, наши совместно просмотренные фильмы. Это тысячи маленьких моментов, которые никто не замечает кроме нас. Я не умею говорить красиво, но знаю точно: ты моё тепло. И я хочу ещё тысячу таких вечеров рядом с тобой.
           </div>
           <div class="chapter-quote">
             «Хочу ещё тысячу таких вечеров, просто рядом с тобой.»
