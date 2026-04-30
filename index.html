@@ -235,6 +235,13 @@
       0%, 100% { opacity: 0.4; transform: scale(1); }
       50% { opacity: 1; transform: scale(1.4); }
     }
+
+    @media (max-width: 600px) {
+      body { cursor: auto; }
+      .cursor, .cursor-trail { display: none; }
+      .open-btn { cursor: pointer; padding: 18px 40px; }
+      .subtitle { font-size: 0.6rem; letter-spacing: 0.3em; }
+    }
   </style>
 </head>
 <body>
